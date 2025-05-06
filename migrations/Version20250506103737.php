@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250506094659 extends AbstractMigration
+final class Version20250506103737 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -59,6 +59,9 @@ final class Version20250506094659 extends AbstractMigration
         $this->addSql(<<<'SQL'
             ALTER TABLE variete ADD CONSTRAINT FK_2CD7CD58326BC1DD FOREIGN KEY (idPlante) REFERENCES plante (id_plante)
         SQL);
+        $this->addSql('ALTER TABLE user MODIFY login VARBINARY(255) NOT NULL');
+        $this->addSql('ALTER TABLE user MODIFY nom VARBINARY(255) NOT NULL');
+        $this->addSql('ALTER TABLE user MODIFY email VARBINARY(255) NOT NULL');
     }
 
     public function down(Schema $schema): void
