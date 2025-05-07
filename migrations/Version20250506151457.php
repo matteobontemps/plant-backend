@@ -59,6 +59,9 @@ final class Version20250506151457 extends AbstractMigration
         $this->addSql(<<<'SQL'
             ALTER TABLE variete ADD CONSTRAINT FK_2CD7CD58326BC1DD FOREIGN KEY (idPlante) REFERENCES plante (id_plante)
         SQL);
+        $this->addSql('ALTER TABLE user MODIFY login VARBINARY(255) NOT NULL');
+        $this->addSql('ALTER TABLE user MODIFY nom VARBINARY(255) NOT NULL');
+        $this->addSql('ALTER TABLE user MODIFY email VARBINARY(255) NOT NULL');
     }
 
     public function down(Schema $schema): void
