@@ -27,6 +27,8 @@ class ParcelleController extends AbstractController
             'idUser' => $p->getIdUser()->getIdUser(), // ou autre selon relation
             'pousses' => array_map(fn($pp) => [
                 'idPousse' => $pp->getIdPousse(),
+                'x' => $pp->getX(),
+                'y' => $pp->getY(),
                 'nbPlants' => $pp->getNbPlants(),
                 'datPlantation' => $pp->getDatePlantation(),
                 'idVariete' => $pp->getIdVariete()->getIdVariete(),
