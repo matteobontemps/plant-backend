@@ -9,9 +9,18 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Service\CryptoService;
+
 
 class AuthController extends AbstractController
 { 
+
+    private CryptoService $crypto;
+
+    public function __construct(CryptoService $crypto)
+    {
+        $this->crypto = $crypto;
+    }
     #[Route('/register', name: 'register')]
     public function register(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
@@ -19,11 +28,11 @@ class AuthController extends AbstractController
          if(!isset($data['login'], $data['email'], $data['password'], $data['nom'])){
             return new JsonResponse(['error' => 'Invalid input'], 400);
          }
-        if($em->getRepository(User::class)->findOneBy(['email'=>$data['email']]))
+        if($em->getRepository(User::class)->findOneBy(['email'=>$this->crypto->encrypt($data['email'])]))
         {
             return new JsonResponse(['error'=>'email already use'],409);
         }
-        if($em->getRepository(User::class)->findOneBy(['login'=>$data['login']]))
+        if($em->getRepository(User::class)->findOneBy(['login'=>$this->crypto->encrypt($data['login'])]))
         {
             return new JsonResponse(['error'=>'login already use'],409);
         }
@@ -31,11 +40,11 @@ class AuthController extends AbstractController
         try{
         $user = new User();
         $user->setIdUser(uniqid());
-        $user->setLogin($data['login']);
-        $user->setEmail($data['email']);
+        $user->setLogin($this->crypto->encrypt($data['login']));
+        $user->setEmail($this->crypto->encrypt($data['email']));
         $hasherP = $passwordHasher->hashPassword($user, $data['password']);
         $user->setPassword($hasherP);
-        $user->setNom($data['nom']);
+        $user->setNom($this->crypto->encrypt($data['nom']));
 
         $em->persist($user);
         $em->flush();
