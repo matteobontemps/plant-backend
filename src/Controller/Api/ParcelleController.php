@@ -5,20 +5,24 @@ namespace App\Controller\Api;
 use App\Entity\Parcelle;
 use App\Entity\User;
 use App\Entity\Pousse;
+use App\Entity\Variete;
 use App\Repository\ParcelleRepository;
+use App\Service\ImageUrlService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
+
 class ParcelleController extends AbstractController
 {
     #[Route('/api/parcelles', name: 'api_parcelles_list', methods: ['GET'])]
-    public function list(ParcelleRepository $repo): JsonResponse
+    public function list(ParcelleRepository $repo, ImageUrlService $imageUrlService): JsonResponse
     {
         $parcelles = $repo->findAll();
         $data = array_map(fn($p) => [
+            'url' => $imageUrlService->getFileUrl('pexels-karolina-grabowska-4022188.jpg'),
             'idParcelle' => $p->getIdParcelle(),
             'libelle' => $p->getLibelle(),
             'longueur' => $p->getLongueur(),
@@ -30,8 +34,22 @@ class ParcelleController extends AbstractController
                 'x' => $pp->getX(),
                 'y' => $pp->getY(),
                 'nbPlants' => $pp->getNbPlants(),
-                'datPlantation' => $pp->getDatePlantation(),
-                'idVariete' => $pp->getIdVariete()->getIdVariete(),
+                'datePlantation' => $pp->getDatePlantation(),
+                'variete' => [
+                    'idVariete' => $pp->getIdVariete()->getIdVariete(),
+                    'libelle' => $pp->getIdVariete()->getLibelle(),
+                    'description' => $pp->getIdVariete()->getDescription(),
+                    'nbGraines' => $pp->getIdVariete()->getNbGraines(),
+                    'ensoleillement' => $pp->getIdVariete()->getEnsoleillement(),
+                    'frequence_arrosage' => $pp->getIdVariete()->getFrequenceArrosage(),
+                    'date_debut_periode_plantation' => $pp->getIdVariete()->getDateDebutPeriodePlantation(),
+                    'date_fin_periode_plantation' => $pp->getIdVariete()->getDateFinPeriodePlantation(),
+                    'resistance_froid' => $pp->getIdVariete()->getResistanceFroid(),
+                    'temps_avant_recolte' => $pp->getIdVariete()->getTempsAvantRecolte(),
+                    'ph' => $pp->getIdVariete()->getPh(),
+                    'image' => $pp->getIdVariete()->getImage(),
+                    'idPlante' => $pp->getIdVariete()->getIdPlante()->getIdPlante()
+                ],
             ],$p->getPousses()->toArray()),
         ], $parcelles);
 
