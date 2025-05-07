@@ -94,7 +94,7 @@ class AuthController extends AbstractController
     #[Route('/logout', name: 'logout')]
     public function logout(Request $request, SessionInterface $session)
     {
-        $session->invalidate();
-        return $this->render('base.html.twig');
+        $session->invalidate(); 
+        return new JsonResponse(['message' => 'Déconnecté avec succès'], 200);
     }
 }
