@@ -10,6 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Service\CryptoService;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 
@@ -89,11 +90,11 @@ class AuthController extends AbstractController
             'Nom' => $session->get('nom')
         ], 200);
     }
-    
-    #[Route('/dashboard', name: 'dashboard')]
-    public function dashboard()
+
+    #[Route('/logout', name: 'logout')]
+    public function logout(Request $request, SessionInterface $session)
     {
-        
-        return $this->render('dashboard.html.twig');
+        $session->invalidate();
+        return $this->render('base.html.twig');
     }
 }
