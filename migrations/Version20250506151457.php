@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250506103737 extends AbstractMigration
+final class Version20250506151457 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -30,7 +30,7 @@ final class Version20250506103737 extends AbstractMigration
             CREATE TABLE plante (id_plante VARCHAR(50) NOT NULL, nom VARCHAR(255) NOT NULL, description LONGTEXT DEFAULT NULL, idCat VARCHAR(50) DEFAULT NULL, INDEX IDX_517A6947BF165E2F (idCat), PRIMARY KEY(id_plante)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE pousse (id_pousse VARCHAR(50) NOT NULL, nb_plants INT DEFAULT NULL, date_plantation DATE DEFAULT NULL, idVariete VARCHAR(50) NOT NULL, idParcelle VARCHAR(50) NOT NULL, INDEX IDX_921E75BB3C6EA6AA (idVariete), INDEX IDX_921E75BB96CD06AD (idParcelle), PRIMARY KEY(id_pousse)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+            CREATE TABLE pousse (id_pousse VARCHAR(50) NOT NULL, x INT DEFAULT NULL, y INT DEFAULT NULL, nb_plants INT DEFAULT NULL, date_plantation DATE DEFAULT NULL, idVariete VARCHAR(50) NOT NULL, idParcelle VARCHAR(50) NOT NULL, INDEX IDX_921E75BB3C6EA6AA (idVariete), INDEX IDX_921E75BB96CD06AD (idParcelle), PRIMARY KEY(id_pousse)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
             CREATE TABLE user (id_user VARCHAR(50) NOT NULL, login VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL, nom VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, UNIQUE INDEX UNIQ_8D93D649AA08CB10 (login), UNIQUE INDEX UNIQ_8D93D649E7927C74 (email), PRIMARY KEY(id_user)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
@@ -59,9 +59,6 @@ final class Version20250506103737 extends AbstractMigration
         $this->addSql(<<<'SQL'
             ALTER TABLE variete ADD CONSTRAINT FK_2CD7CD58326BC1DD FOREIGN KEY (idPlante) REFERENCES plante (id_plante)
         SQL);
-        $this->addSql('ALTER TABLE user MODIFY login VARBINARY(255) NOT NULL');
-        $this->addSql('ALTER TABLE user MODIFY nom VARBINARY(255) NOT NULL');
-        $this->addSql('ALTER TABLE user MODIFY email VARBINARY(255) NOT NULL');
     }
 
     public function down(Schema $schema): void

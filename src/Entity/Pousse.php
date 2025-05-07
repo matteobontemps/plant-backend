@@ -14,6 +14,12 @@ class Pousse
     private ?string $idPousse = null;
 
     #[ORM\Column(nullable: true)]
+    private ?int $x = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $y = null;
+
+    #[ORM\Column(nullable: true)]
     private ?int $nbPlants = null;
 
     #[ORM\ManyToOne(inversedBy: 'pousses')]
@@ -35,6 +41,30 @@ class Pousse
     public function setIdPousse(string $idPousse): static
     {
         $this->idPousse = $idPousse;
+
+        return $this;
+    }
+
+    public function getX(): ?int
+    {
+        return $this->x;
+    }
+
+    public function setX(?int $x): static
+    {
+        $this->x = $x;
+
+        return $this;
+    }
+
+    public function getY(): ?int
+    {
+        return $this->y;
+    }
+
+    public function setY(?int $y): static
+    {
+        $this->y = $y;
 
         return $this;
     }
