@@ -17,15 +17,15 @@ security:
             lazy: true
             provider: database_users  # Utilisation du fournisseur basé sur la base de données
 
-            form_login:
-                login_path: login
-                check_path: login
-                username_parameter: email
-                password_parameter: password
-                default_target_path: /dashboard  # Après connexion réussie, redirection vers le dashboard
-            logout:
-                path: /logout
-                invalidate_session: true  # Déconnexion et invalidation de la session
+            # form_login:
+            #     login_path: login
+            #     check_path: login
+            #     username_parameter: login
+            #     password_parameter: password
+            #     default_target_path: /dashboard  # Après connexion réussie, redirection vers le dashboard
+            # logout:
+            #     path: /logout
+            #     invalidate_session: true  # Déconnexion et invalidation de la session
             
             remember_me:
                 secret: '%kernel.secret%'  # Clé secrète pour le "remember me"
