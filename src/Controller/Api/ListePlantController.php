@@ -1,6 +1,7 @@
 <?php 
 namespace App\Controller\Api;
 use App\Repository\PlanteRepository;
+use App\Repository\CategorieRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -43,4 +44,17 @@ class ListePlantController extends AbstractController{
         return new JsonResponse($this->formatPlantes($plantes), 200);
 
     }    
+
+    #[Route('/catPlant', name: 'ListePlantCat', methods: ['GET'])]
+    public function afficher_cat(CategorieRepository $repo) : JsonResponse{
+        $categories =$repo->findAll();
+        $listCat = [];
+        foreach ($categories as $cat){
+            $listCat[] = [
+                'id'=> $cat->getIdCat(),
+                'libelle'=> $cat->getLibelle()
+            ];
+        }
+        return new JsonResponse($listCat, 200);
+    }
 }
