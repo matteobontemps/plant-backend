@@ -93,4 +93,33 @@ public function addVariete(Request $request, EntityManagerInterface $em, PlanteR
 
     return new JsonResponse(['message' => 'Variété ajoutée avec succès'], 201);
 }
+    #[Route('/{id}', name: 'api_varietes_get', methods: ['GET'])]
+public function getVariete(VarieteRepository $repo, $id): JsonResponse
+{
+    $variete = $repo->find($id);
+
+    if (!$variete) {
+        return $this->json(['message' => 'Variété non trouvée'], 404);
+    }
+
+    $data = [
+        'idVariete' => $variete->getIdVariete(),
+        'libelle' => $variete->getLibelle(),
+        'description' => $variete->getDescription(),
+        'nbGraines' => $variete->getNbGraines(),
+        'ensoleillement' => $variete->getEnsoleillement(),
+        'frequence_arrosage' => $variete->getFrequenceArrosage(),
+        'date_debut_periode_plantation' => $variete->getDateDebutPeriodePlantation()?->format('Y-m-d'),
+        'date_fin_periode_plantation' => $variete->getDateFinPeriodePlantation()?->format('Y-m-d'),
+        'resistance_froid' => $variete->getResistanceFroid(),
+        'temps_avant_recolte' => $variete->getTempsAvantRecolte(),
+        'ph' => $variete->getPh(),
+        'image' => $variete->getImage(),
+        'idPlante' => $variete->getIdPlante()?->getIdPlante(),
+        'planteNom' => $variete->getIdPlante()?->getNom(),
+    ];
+
+    return $this->json($data);
+}
+
 }

@@ -15,7 +15,15 @@ class PlanteRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Plante::class);
     }
-
+    public function findByCategorie(int $idCat): array
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.idCat', 'c')
+            ->andWhere('c.idCat = :idCat')
+            ->setParameter('idCat', $idCat)
+            ->getQuery()
+            ->getResult();
+    }
     //    /**
     //     * @return Plante[] Returns an array of Plante objects
     //     */

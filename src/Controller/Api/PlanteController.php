@@ -51,4 +51,31 @@ class PlanteController extends AbstractController
 
         return $this->json($data);
     }
+    #[Route('/api/plantes/{id}', name: 'api_plantes_get', methods: ['GET'])]
+    public function getPlante(string $id, PlanteRepository $repo): JsonResponse
+    {
+        $plante = $repo->findOneBy(['idPlante' => $id]);
+
+        if (!$plante) {
+            return $this->json(['message' => 'Plante non trouvée'], 404);
+        }
+
+        $data = [
+            'idPlante' => $plante->getIdPlante(),
+            'nom' => $plante->getNom(),
+            'description' => $plante->getDescription(),
+            'categorie' => $plante->getIdCat() ? [
+                'idCat' => $plante->getIdCat()->getIdCat(),
+                'libelleCat' => $plante->getIdCat()->getLibelle()
+            ] : null,
+            'varietes' => array_map(fn(Variete $v) => [
+                'idVariete' => $v->getIdVariete(),
+                'libelle' => $v->getLibelle(),
+                'description' => $v->getDescription(),
+            ], $plante->getVarietes()->toArray()),
+        ];
+
+        return $this->json($data);
+    }
+        
 }
