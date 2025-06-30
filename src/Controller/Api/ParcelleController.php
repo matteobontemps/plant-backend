@@ -13,14 +13,20 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 
 
 class ParcelleController extends AbstractController
 {
     #[Route('/api/parcelles', name: 'api_parcelles_list', methods: ['GET'])]
-    public function list(ParcelleRepository $repo, ImageUrlService $imageUrlService): JsonResponse
+    public function list(ParcelleRepository $repo, ImageUrlService $imageUrlService, SessionInterface $session): JsonResponse
     {
-        $parcelles = $repo->findAll();
+        if (!$session->has('user_id')) {
+            return new JsonResponse(['error' => 'Acces non autorise.'], 401);
+        }
+        $userId = $session->get('user_id');
+        $parcelles = $repo->findBy(['idUser' => $userId]);
         $data = array_map(fn($p) => [
             'url' => $imageUrlService->getFileUrl('pexels-karolina-grabowska-4022188.jpg'),
             'idParcelle' => $p->getIdParcelle(),
@@ -28,7 +34,7 @@ class ParcelleController extends AbstractController
             'longueur' => $p->getLongueur(),
             'largeur' => $p->getLargeur(),
             'taille_carres' => $p->getTailleCarres(),
-            'idUser' => $p->getIdUser()->getIdUser(), // ou autre selon relation
+            'idUser' => $p->getIdUser()->getIdUser(),
             'pousses' => array_map(fn($pp) => [
                 'idPousse' => $pp->getIdPousse(),
                 'x' => $pp->getX(),
@@ -57,8 +63,16 @@ class ParcelleController extends AbstractController
     }
 
     #[Route('/api/parcelles', name: 'api_parcelles_create', methods: ['POST'])]
-    public function create(Request $request, EntityManagerInterface $em): JsonResponse
+    public function create(Request $request, EntityManagerInterface $em, SessionInterface $session): JsonResponse
     {
+         if (!$session->has('user_id')) {
+            return new JsonResponse(['error' => 'Acces non autorise.'], 401);
+        }
+        $userId = $session->get('user_id');
+        $user = $em->getRepository(User::class)->find($userId);
+        if (!$user) {
+            return $this->json(['error' => 'Utilisateur non trouvé'], 404);
+        }
         $data = json_decode($request->getContent(), true);
 
         $parcelle = new Parcelle();
@@ -67,13 +81,12 @@ class ParcelleController extends AbstractController
         $parcelle->setLongueur($data['longueur']);
         $parcelle->setLargeur($data['largeur']);
         $parcelle->setTailleCarres($data['taille_carres']);
-
+        $parcelle->setIdUser($user);
         // TODO : récupérer l'utilisateur connecté ou passer l'id en POST
         // Exemple avec un User fictif :
         // $user = $em->getRepository(\App\Entity\User::class)->find($data['idUser']);
         // if (!$user) return $this->json(['error' => 'Utilisateur non trouvé'], 404);
 
-        $parcelle->setIdUser($em->getRepository(User::class)->find('U001'));
 
         $em->persist($parcelle);
         $em->flush();
