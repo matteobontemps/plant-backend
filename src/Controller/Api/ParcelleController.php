@@ -112,5 +112,27 @@ public function listSimple(
 
     return $this->json($data);
 }
+#[Route('/api/parcelles/{id}', name: 'api_parcelle_delete', methods: ['DELETE'])]
+public function delete(string $id, EntityManagerInterface $em, ParcelleRepository $repo, SessionInterface $session): JsonResponse
+{
+    if (!$session->has('user_id')) {
+        return new JsonResponse(['error' => 'Accès non autorisé.'], 401);
+    }
 
+    $userId = $session->get('user_id');
+
+    $parcelle = $repo->find($id);
+    if (!$parcelle) {
+        return new JsonResponse(['error' => 'Parcelle non trouvée.'], 404);
+    }
+
+    if ($parcelle->getIdUser()->getIdUser() !== $userId) {
+        return new JsonResponse(['error' => 'Accès non autorisé à cette parcelle.'], 403);
+    }
+
+    $em->remove($parcelle);
+    $em->flush();
+
+    return new JsonResponse(['message' => 'Parcelle supprimée avec succès.'], 200);
+}
 }
