@@ -38,12 +38,14 @@ class ListePlantController extends AbstractController{
         return new JsonResponse($this->formatPlantes($plantes), 200);
     }
 
-    #[Route('/ListePlant/{idCat}', name: 'ListePlantFiltre', methods: ['GET'])]
-    public function afficher_plantes_filtre(PlanteRepository $repo, int $idCat): JsonResponse{
-       $plantes = $repo->findByCategorie($idCat);
-        return new JsonResponse($this->formatPlantes($plantes), 200);
+#[Route('/ListePlant/{idCat}', name: 'ListePlantFiltre', methods: ['GET'])]
+public function afficher_plantes_filtre(PlanteRepository $repo, $idCat): JsonResponse
+{
+    $idCat = (int)$idCat;
+    $plantes = $repo->findByCategorie($idCat);
+    return new JsonResponse($this->formatPlantes($plantes), 200);
+}
 
-    }    
 
     #[Route('/catPlant', name: 'ListePlantCat', methods: ['GET'])]
     public function afficher_cat(CategorieRepository $repo) : JsonResponse{
