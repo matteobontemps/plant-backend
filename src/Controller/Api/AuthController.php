@@ -62,8 +62,8 @@ class AuthController extends AbstractController
             return new JsonResponse(['error'=>'server error', 'details'=>$e->getMessage()],500);
         }
     }
-    #[Route('/login', name: 'login', methods: ['POST'])]
-    public function login(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher,SessionInterface $session): JsonResponse
+    #[Route('/connexion', name: 'connexion', methods: ['POST'])]
+    public function connexion(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher,SessionInterface $session): JsonResponse
     {  
         $data = json_decode($request->getContent(), true);
 
