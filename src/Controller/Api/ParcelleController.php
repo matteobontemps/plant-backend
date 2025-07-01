@@ -93,4 +93,24 @@ class ParcelleController extends AbstractController
 
         return $this->json(['message' => 'Parcelle ajoutée']);
     }
+    #[Route('/api/parcelles/simple', name: 'api_parcelles_simple', methods: ['GET'])]
+public function listSimple(
+    ParcelleRepository $repo,
+    SessionInterface $session
+): JsonResponse {
+    if (!$session->has('user_id')) {
+        return new JsonResponse(['error' => 'Acces non autorise.'], 401);
+    }
+
+    $userId = $session->get('user_id');
+    $parcelles = $repo->findBy(['idUser' => $userId]);
+
+    $data = array_map(fn($p) => [
+        'idParcelle' => $p->getIdParcelle(),
+        'libelle' => $p->getLibelle(),
+    ], $parcelles);
+
+    return $this->json($data);
+}
+
 }
