@@ -44,82 +44,101 @@ class VarieteController extends AbstractController
     }
 
     #[Route('', name: 'api_varietes_add', methods: ['POST'])]
-public function addVariete(Request $request, EntityManagerInterface $em, PlanteRepository $planteRepo): JsonResponse
-{
-    $data = json_decode($request->getContent(), true);
+    public function addVariete(
+        Request $request,
+        EntityManagerInterface $em,
+        PlanteRepository $planteRepo,
+        ImageUrlService $imageUrlService
+    ): JsonResponse
+    {
+        // Les champs textes
+        $data = $request->request->all();
 
-    if (!$data || empty($data['libelle']) || empty($data['idPlante'])) {
-        return new JsonResponse(['message' => 'Données incomplètes'], 400);
-    }
-
-    $plante = $planteRepo->find($data['idPlante']);
-    if (!$plante) {
-        return new JsonResponse(['message' => 'Plante introuvable'], 404);
-    }
-
-    $variete = new Variete();
-    $variete->setIdVariete(uniqid());
-    $variete->setLibelle($data['libelle']);
-    $variete->setIdPlante($plante);
-
-    $variete->setDescription($data['description'] ?? null);
-    $variete->setNbGraines($data['nbGraines'] ?? null);
-    $variete->setEnsoleillement($data['ensoleillement'] ?? null);
-    $variete->setFrequenceArrosage($data['frequence_arrosage'] ?? null);
-
-    if (!empty($data['date_debut_periode_plantation'])) {
-        try {
-            $variete->setDateDebutPeriodePlantation(new \DateTime($data['date_debut_periode_plantation']));
-        } catch (\Exception $e) {
-            return new JsonResponse(['message' => 'Format date_debut_periode_plantation invalide'], 400);
+        if (empty($data['libelle']) || empty($data['idPlante'])) {
+            return new JsonResponse(['message' => 'Données incomplètes'], 400);
         }
-    }
 
-    if (!empty($data['date_fin_periode_plantation'])) {
-        try {
-            $variete->setDateFinPeriodePlantation(new \DateTime($data['date_fin_periode_plantation']));
-        } catch (\Exception $e) {
-            return new JsonResponse(['message' => 'Format date_fin_periode_plantation invalide'], 400);
+        $plante = $planteRepo->find($data['idPlante']);
+        if (!$plante) {
+            return new JsonResponse(['message' => 'Plante introuvable'], 404);
         }
+
+        $variete = new Variete();
+        $variete->setIdVariete(uniqid());
+        $variete->setLibelle($data['libelle']);
+        $variete->setIdPlante($plante);
+        $variete->setDescription($data['description'] ?? null);
+        $variete->setNbGraines($data['nbGraines'] ?? null);
+        $variete->setEnsoleillement($data['ensoleillement'] ?? null);
+        $variete->setFrequenceArrosage($data['frequence_arrosage'] ?? null);
+
+        if (!empty($data['date_debut_periode_plantation'])) {
+            try {
+                $variete->setDateDebutPeriodePlantation(new \DateTime($data['date_debut_periode_plantation']));
+            } catch (\Exception $e) {
+                return new JsonResponse(['message' => 'Format date_debut_periode_plantation invalide'], 400);
+            }
+        }
+
+        if (!empty($data['date_fin_periode_plantation'])) {
+            try {
+                $variete->setDateFinPeriodePlantation(new \DateTime($data['date_fin_periode_plantation']));
+            } catch (\Exception $e) {
+                return new JsonResponse(['message' => 'Format date_fin_periode_plantation invalide'], 400);
+            }
+        }
+
+        $variete->setResistanceFroid($data['resistance_froid'] ?? null);
+        $variete->setTempsAvantRecolte($data['temps_avant_recolte'] ?? null);
+        $variete->setPh($data['ph'] ?? null);
+
+        // ✅ Gérer l'image uploadée
+        $uploadedFile = $request->files->get('image');
+        if ($uploadedFile) {
+            // Tu peux utiliser ton ImageUrlService pour stocker le fichier et obtenir l'URL
+            try {
+                $imageUrl = $imageUrlService->uploadImage($uploadedFile, 'varietes');
+                $variete->setImage($imageUrl);
+            } catch (\Exception $e) {
+                return new JsonResponse(['message' => 'Erreur upload image: ' . $e->getMessage()], 500);
+            }
+        }
+
+        $em->persist($variete);
+        $em->flush();
+
+        return new JsonResponse(['message' => 'Variété ajoutée avec succès'], 201);
     }
 
-    $variete->setResistanceFroid($data['resistance_froid'] ?? null);
-    $variete->setTempsAvantRecolte($data['temps_avant_recolte'] ?? null);
-    $variete->setPh($data['ph'] ?? null);
-    $variete->setImage($data['image'] ?? null);
+        #[Route('/{id}', name: 'api_varietes_get', methods: ['GET'])]
+    public function getVariete(VarieteRepository $repo, $id): JsonResponse
+    {
+        $variete = $repo->find($id);
 
-    $em->persist($variete);
-    $em->flush();
+        if (!$variete) {
+            return $this->json(['message' => 'Variété non trouvée'], 404);
+        }
 
-    return new JsonResponse(['message' => 'Variété ajoutée avec succès'], 201);
-}
-    #[Route('/{id}', name: 'api_varietes_get', methods: ['GET'])]
-public function getVariete(VarieteRepository $repo, $id): JsonResponse
-{
-    $variete = $repo->find($id);
+        $data = [
+            'idVariete' => $variete->getIdVariete(),
+            'libelle' => $variete->getLibelle(),
+            'description' => $variete->getDescription(),
+            'nbGraines' => $variete->getNbGraines(),
+            'ensoleillement' => $variete->getEnsoleillement(),
+            'frequence_arrosage' => $variete->getFrequenceArrosage(),
+            'date_debut_periode_plantation' => $variete->getDateDebutPeriodePlantation()?->format('Y-m-d'),
+            'date_fin_periode_plantation' => $variete->getDateFinPeriodePlantation()?->format('Y-m-d'),
+            'resistance_froid' => $variete->getResistanceFroid(),
+            'temps_avant_recolte' => $variete->getTempsAvantRecolte(),
+            'ph' => $variete->getPh(),
+            'image' => $variete->getImage(),
+            'idPlante' => $variete->getIdPlante()?->getIdPlante(),
+            'planteNom' => $variete->getIdPlante()?->getNom(),
+        ];
 
-    if (!$variete) {
-        return $this->json(['message' => 'Variété non trouvée'], 404);
+        return $this->json($data);
     }
 
-    $data = [
-        'idVariete' => $variete->getIdVariete(),
-        'libelle' => $variete->getLibelle(),
-        'description' => $variete->getDescription(),
-        'nbGraines' => $variete->getNbGraines(),
-        'ensoleillement' => $variete->getEnsoleillement(),
-        'frequence_arrosage' => $variete->getFrequenceArrosage(),
-        'date_debut_periode_plantation' => $variete->getDateDebutPeriodePlantation()?->format('Y-m-d'),
-        'date_fin_periode_plantation' => $variete->getDateFinPeriodePlantation()?->format('Y-m-d'),
-        'resistance_froid' => $variete->getResistanceFroid(),
-        'temps_avant_recolte' => $variete->getTempsAvantRecolte(),
-        'ph' => $variete->getPh(),
-        'image' => $variete->getImage(),
-        'idPlante' => $variete->getIdPlante()?->getIdPlante(),
-        'planteNom' => $variete->getIdPlante()?->getNom(),
-    ];
-
-    return $this->json($data);
-}
+    
 
 }
