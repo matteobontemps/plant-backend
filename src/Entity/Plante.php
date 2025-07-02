@@ -25,6 +25,9 @@ class Plante
     #[ORM\JoinColumn(name: 'idCat', referencedColumnName: 'id_cat')]
     private ?Categorie $idCat = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $image = null;
+
     /**
      * @var Collection<int, Variete>
      */
@@ -80,6 +83,18 @@ class Plante
     public function setIdCat(?Categorie $idCat): static
     {
         $this->idCat = $idCat;
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(string $image): static
+    {
+        $this->image = $image;
 
         return $this;
     }
