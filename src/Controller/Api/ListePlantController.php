@@ -5,6 +5,8 @@ use App\Repository\CategorieRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Service\ImageUrlService;
+
 
 class ListePlantController extends AbstractController{
 
@@ -26,7 +28,8 @@ class ListePlantController extends AbstractController{
                 'desc' => $plante->getDescription(),
                 'idcat' => $category ? $category->getIdCat() : null,
                 'cat' => $category ? $category->getLibelle() : null,
-                'varietes' => $varietesData
+                'varietes' => $varietesData,
+                'image' => $plante -> getImage()
             ];
         }
         return $listPlant;
