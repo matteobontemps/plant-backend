@@ -100,6 +100,7 @@ class PlanteController extends AbstractController
                 'idVariete' => $v->getIdVariete(),
                 'libelle' => $v->getLibelle(),
                 'description' => $v->getDescription(),
+                'image'=> $v->getImage()
             ], $plante->getVarietes()->toArray()),
         ];
 
