@@ -38,11 +38,11 @@ class AuthController extends AbstractController
         }
         if($em->getRepository(User::class)->findOneBy(['email'=>$this->crypto->encrypt($data['email'])]))
         {
-            return new JsonResponse(['error'=>'email already use'],409);
+            return new JsonResponse(['error'=>'Email déjà pris !'],409);
         }
         if($em->getRepository(User::class)->findOneBy(['login'=>$this->crypto->encrypt($data['login'])]))
         {
-            return new JsonResponse(['error'=>'login already use'],409);
+            return new JsonResponse(['error'=>'Login déjà pris !'],409);
         }
 
         try{

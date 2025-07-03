@@ -51,7 +51,6 @@ class VarieteController extends AbstractController
         ImageUrlService $imageUrlService
     ): JsonResponse
     {
-        // Les champs textes
         $data = $request->request->all();
 
         if (empty($data['libelle']) || empty($data['idPlante'])) {
@@ -92,10 +91,8 @@ class VarieteController extends AbstractController
         $variete->setTempsAvantRecolte($data['temps_avant_recolte'] ?? null);
         $variete->setPh($data['ph'] ?? null);
 
-        // ✅ Gérer l'image uploadée
         $uploadedFile = $request->files->get('image');
         if ($uploadedFile) {
-            // Tu peux utiliser ton ImageUrlService pour stocker le fichier et obtenir l'URL
             try {
                 $imageUrl = $imageUrlService->uploadImage($uploadedFile, 'varietes');
                 $variete->setImage($imageUrl);
